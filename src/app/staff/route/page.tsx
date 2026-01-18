@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouteStore } from '@/stores'
 import { patients as mockPatients, calculateAge } from '@/data/patients'
 import { todaysVisits } from '@/data/visits'
+import { MapboxRouteMap } from '@/components/map'
 
 export default function RoutePage() {
   const currentRoute = useRouteStore((state) => state.currentRoute)
@@ -256,52 +257,15 @@ export default function RoutePage() {
           </div>
         </div>
       ) : (
-        /* Map View Placeholder */
+        /* Real Mapbox Map */
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-fade-up animate-delay-300">
-          <div className="relative h-96 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
-            {/* Stylized map placeholder */}
-            <div className="absolute inset-0 opacity-30">
-              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0,50 Q25,30 50,50 T100,50" stroke="currentColor" fill="none" strokeWidth="0.5" className="text-slate-400" />
-                <path d="M0,70 Q35,50 70,70 T100,70" stroke="currentColor" fill="none" strokeWidth="0.5" className="text-slate-400" />
-                <path d="M20,0 Q30,50 20,100" stroke="currentColor" fill="none" strokeWidth="0.5" className="text-slate-400" />
-                <path d="M60,0 Q50,50 60,100" stroke="currentColor" fill="none" strokeWidth="0.5" className="text-slate-400" />
-              </svg>
-            </div>
-
-            {/* Map markers */}
-            {currentRoute.stops.map((stop, index) => (
-              <div
-                key={stop.visitId}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  left: `${15 + (index * 70 / (currentRoute.stops.length - 1 || 1))}%`,
-                  top: `${30 + Math.sin(index) * 20}%`
-                }}
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-lg ${
-                  stop.isCompleted
-                    ? 'bg-success-500 text-white'
-                    : 'bg-primary-500 text-white'
-                }`}>
-                  {index + 1}
-                </div>
-              </div>
-            ))}
-
-            {/* Center message */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-                <svg className="w-12 h-12 mx-auto text-primary-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-                <h3 className="font-semibold text-slate-900 dark:text-white">Interaktive Karte</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  Wird mit Mapbox integriert
-                </p>
-              </div>
-            </div>
-          </div>
+          <MapboxRouteMap
+            patients={currentRoute.stops
+              .map(stop => mockPatients.find(p => p.id === stop.patientId))
+              .filter((p): p is typeof mockPatients[0] => p !== undefined)}
+            showRoute={true}
+            height="400px"
+          />
         </div>
       )}
     </div>
